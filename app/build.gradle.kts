@@ -17,9 +17,16 @@ val gitCommitDateProvider = providers.exec {
     workingDir = rootProject.rootDir
 }.standardOutput.asText!!
 
-private val seed = (project.properties["PACKAGE_NAME_SEED"] as? String ?: "0").toLong().also { println("Seed for package name: $it") }
-private val myPackageName = genPackageName(seed).also { println("Package name: $it") }
+private fun projectProp(name: String): String? =
+    (findProperty(name) as? String)?.trim()?.takeIf { it.isNotEmpty() }
 
+private val seed = projectProp("PACKAGE_NAME_SEED")?.toLongOrNull() ?: 0L
+
+private val myPackageName = projectProp("PACKAGE_NAME")
+    ?: genPackageName(seed)
+
+println("Seed for package name: $seed")
+println("Package name: $myPackageName")
 private fun genPackageName(seed: Long): String {
     val ALPHA = "abcdefghijklmnopqrstuvwxyz"
     val ALPHADOTS = "$ALPHA....."
